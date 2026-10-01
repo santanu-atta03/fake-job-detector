@@ -1,0 +1,539 @@
+.app {
+    min-height: 100vh;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+
+.hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
+    color: white;
+}
+
+
+.hero-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+
+.hero h1 {
+    font-size: 42px;
+    margin: 0 0 12px;
+}
+
+
+.hero p {
+    max-width: 650px;
+    margin: auto;
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+
+.container {
+    width: min(
+        900px,
+        calc(100% - 40px)
+    );
+
+    margin: 40px auto;
+}
+
+
+.form-section,
+.result-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow:
+        0 10px 30px rgba(
+            15,
+            23,
+            42,
+            0.08
+        );
+
+    margin-bottom: 30px;
+}
+
+
+.form-section h2 {
+    margin-top: 0;
+}
+
+
+.section-description {
+    color: #64748b;
+}
+
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    font-family: inherit;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+
+    border-color: #6366f1;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(99, 102, 241, 0.1);
+}
+
+
+.form-row {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 20px;
+}
+
+
+.checkbox-row {
+    display: flex;
+
+    gap: 30px;
+
+    margin-bottom: 25px;
+
+    flex-wrap: wrap;
+}
+
+
+.checkbox-row label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #475569;
+}
+
+
+.checkbox-row input {
+    width: auto;
+}
+
+
+button {
+    width: 100%;
+
+    padding: 14px 20px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #4f46e5;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        transform 0.1s;
+}
+
+
+button:hover {
+    background: #4338ca;
+}
+
+
+button:active {
+    transform: scale(0.99);
+}
+
+
+button:disabled {
+    background: #94a3b8;
+
+    cursor: not-allowed;
+}
+
+
+.result-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.result-header h2 {
+    margin: 0;
+}
+
+
+.status {
+    padding: 8px 14px;
+
+    border-radius: 999px;
+
+    font-weight: 600;
+
+    font-size: 14px;
+}
+
+
+.status.fraudulent {
+    background: #fee2e2;
+
+    color: #b91c1c;
+}
+
+
+.status.legitimate {
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+.risk-meter {
+    text-align: center;
+
+    padding: 40px 20px;
+}
+
+
+.risk-score span {
+    font-size: 64px;
+
+    font-weight: 800;
+}
+
+
+.risk-label {
+    font-size: 20px;
+
+    font-weight: 700;
+
+    margin-top: 5px;
+}
+
+
+.meter-track {
+    width: 100%;
+
+    height: 14px;
+
+    background: #e2e8f0;
+
+    border-radius: 999px;
+
+    margin-top: 25px;
+
+    overflow: hidden;
+}
+
+
+.meter-fill {
+    height: 100%;
+
+    border-radius: 999px;
+
+    transition: width 0.8s ease;
+}
+
+
+.reasons-section {
+    margin-top: 20px;
+}
+
+
+.reasons-section h3 {
+    margin-bottom: 15px;
+}
+
+
+.reason {
+    display: flex;
+
+    gap: 12px;
+
+    align-items: flex-start;
+
+    padding: 14px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+
+    margin-bottom: 10px;
+
+    color: #334155;
+
+    line-height: 1.5;
+}
+
+
+.reason-icon {
+    color: #f97316;
+}
+
+
+.no-reasons {
+    padding: 15px;
+
+    background: #f0fdf4;
+
+    color: #166534;
+
+    border-radius: 8px;
+}
+
+
+.disclaimer {
+    margin-top: 25px;
+
+    padding: 15px;
+
+    background: #fff7ed;
+
+    border-left: 4px solid #f97316;
+
+    color: #7c2d12;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+.error {
+    padding: 15px;
+
+    margin-bottom: 25px;
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    border-radius: 8px;
+}
+
+
+footer {
+    text-align: center;
+
+    padding: 30px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+@media (max-width: 650px) {
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .result-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+
+    .risk-score span {
+        font-size: 50px;
+    }
+}
+
+/* ============================================================
+   DOMAIN REPUTATION CARD STYLES
+   ============================================================ */
+
+.domain-reputation-card {
+    margin: 20px 0;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.domain-reputation-card.risk-detected {
+    border-color: #fca5a5;
+    background: #fff5f5;
+}
+
+.domain-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.domain-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 15px;
+}
+
+.domain-title .domain-icon {
+    color: #4f46e5;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.risk-badge {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.clean-badge {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.domain-summary-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pill {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pill-danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.pill-warning {
+    background: #fffbebf;
+    color: #d97706;
+    border: 1px solid #fef3c7;
+}
+
+.domain-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.domain-item {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+}
+
+.domain-item.item-risk {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.domain-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.domain-name {
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+}
+
+.domain-age {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+}
+
+.domain-flags {
+    margin: 8px 0 0 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: #b91c1c;
+}
+
+.domain-flags li {
+    margin-bottom: 3px;
+}

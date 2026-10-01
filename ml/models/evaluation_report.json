@@ -1,0 +1,16 @@
+{
+    "test_samples": 3576,
+    "test_fraud_count": 173,
+    "decision_threshold": 0.26,
+    "roc_auc": 0.978,
+    "pr_auc": 0.881,
+    "precision": 0.8782,
+    "recall": 0.7919,
+    "f1_score": 0.8328,
+    "confusion_matrix": {
+        "true_negatives": 3384,
+        "false_positives": 19,
+        "false_negatives": 36,
+        "true_positives": 137
+    }
+}

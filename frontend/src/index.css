@@ -1,0 +1,270 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body,
+#root {
+    margin: 0;
+
+    min-height: 100%;
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+body {
+    margin: 0;
+}
+
+
+:root {
+  --ink: #191D1B;
+  --paper: #F5F6F3;
+  --card: #FFFFFF;
+  --line: #DEE2DC;
+  --muted: #6B7069;
+  --brand: #23554B;
+  --brand-soft: #E7EEEA;
+  --focus: #23554B;
+
+  --risk-low: #2F7D5A;
+  --risk-medium: #B8862E;
+  --risk-high: #C15A2E;
+  --risk-critical: #AE3A3A;
+}
+
+/* ---------- Layout wrapper (wrap JobForm + ResultCard in this) ---------- */
+.docket-app {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100%;
+  padding: 40px 24px 64px;
+}
+.docket-app * { box-sizing: border-box; }
+
+.docket-shell { max-width: 1080px; margin: 0 auto; }
+
+.docket-masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.docket-wordmark {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+}
+.docket-wordmark span { font-style: italic; color: var(--brand); }
+.docket-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.docket-layout {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 880px) {
+  .docket-layout { grid-template-columns: 1fr; }
+}
+
+/* ---------- JobForm ---------- */
+.job-form {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px;
+}
+
+.job-form fieldset { border: none; padding: 0; margin: 0 0 26px; }
+.job-form fieldset:last-of-type { margin-bottom: 0; }
+.job-form legend {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 0 12px;
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.field label { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.field-hint { font-size: 12px; color: var(--muted); }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 520px) { .row-2 { grid-template-columns: 1fr; } }
+
+.job-form input[type="text"],
+.job-form select,
+.job-form textarea {
+  width: 100%;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px 12px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.job-form textarea { resize: vertical; line-height: 1.5; }
+.job-form input::placeholder, .job-form textarea::placeholder { color: #9AA098; }
+
+.job-form input:focus, .job-form select:focus, .job-form textarea:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.input-icon-row { position: relative; display: flex; align-items: center; }
+.input-icon-row svg { position: absolute; left: 12px; color: var(--muted); pointer-events: none; }
+.input-icon-row input { padding-left: 34px; }
+
+.checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .checkbox-grid { grid-template-columns: 1fr; } }
+.checkbox-card {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px; font-size: 13.5px; cursor: pointer;
+  background: var(--paper);
+}
+.checkbox-card input { width: 16px; height: 16px; accent-color: var(--brand); }
+
+.submit-btn {
+  width: 100%;
+  margin-top: 26px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 13px 16px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, opacity 150ms ease;
+}
+.submit-btn:hover:not(:disabled) { background: var(--brand); }
+.submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ---------- Results panel wrapper ---------- */
+.panel-results {
+  position: sticky;
+  top: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (max-width: 880px) { .panel-results { position: static; } }
+
+.empty-state { margin: auto; padding: 48px 32px; text-align: center; }
+.empty-title { font-family: 'Fraunces', serif; font-size: 18px; margin: 14px 0 6px; }
+.empty-text { font-size: 13.5px; color: var(--muted); line-height: 1.55; max-width: 280px; margin: 0 auto; }
+
+.loading-state { margin: auto; padding: 48px 40px; width: 100%; }
+.skel {
+  background: linear-gradient(90deg, var(--line) 25%, #EDEFEA 37%, var(--line) 63%);
+  background-size: 400% 100%;
+  animation: docket-shimmer 1.3s ease infinite;
+  border-radius: 6px;
+  margin: 0 auto 12px;
+}
+.skel-circle { width: 96px; height: 96px; border-radius: 50%; }
+.skel-line { height: 11px; }
+@keyframes docket-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* ---------- ResultCard ---------- */
+.result-card { display: flex; flex-direction: column; height: 100%; }
+.result-tab { height: 4px; width: 100%; }
+.result-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 0; }
+.verdict { display: flex; align-items: center; gap: 8px; font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; }
+.reset-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 1px solid var(--line); border-radius: 6px;
+  padding: 6px 10px; font-size: 12px; color: var(--muted); cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+.reset-btn:hover { border-color: var(--muted); color: var(--ink); }
+
+.disclaimer {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: 14px 24px;
+}
+
+/* ---------- RiskMeter ---------- */
+.gauge { display: flex; flex-direction: column; align-items: center; padding: 12px 24px 4px; }
+.gauge-svg { width: 220px; height: 130px; }
+.gauge-number { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; }
+.gauge-caption {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: -6px;
+}
+
+/* ---------- ReasonList ---------- */
+.findings-section { padding: 8px 24px 20px; flex: 1; }
+.findings-heading {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+}
+.findings-list { list-style: none; margin: 0; padding: 0; }
+.finding-item {
+  display: flex; gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px; line-height: 1.5;
+}
+.finding-item:last-child { border-bottom: none; }
+.finding-index {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--brand);
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.finding-clear {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13.5px; color: var(--brand); padding: 14px 0;
+}
