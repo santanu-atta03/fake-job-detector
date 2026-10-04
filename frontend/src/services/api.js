@@ -1,7 +1,16 @@
-const API_URL = "http://127.0.0.1:8000/api/v1";
+function getApiUrl() {
+    const backendUrl = import.meta.env.VITE_API_URL
+        || (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
+
+    if (!backendUrl) {
+        throw new Error("VITE_API_URL must be set to the deployed backend URL");
+    }
+
+    return `${backendUrl.replace(/\/+$/, "")}/api/v1`;
+}
 
 export async function analyzeJob(jobData) {
-    const response = await fetch(`${API_URL}/predict`, {
+    const response = await fetch(`${getApiUrl()}/predict`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -17,7 +26,7 @@ export async function analyzeJob(jobData) {
 }
 
 export async function scrapeJobUrl(url) {
-    const response = await fetch(`${API_URL}/scrape`, {
+    const response = await fetch(`${getApiUrl()}/scrape`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
