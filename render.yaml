@@ -12,3 +12,5 @@ services:
         value: 3.12.8
       - key: MONGO_URL
         sync: false
+      - key: MODEL_VARIANT
+        value: tfidf

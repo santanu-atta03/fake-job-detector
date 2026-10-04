@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import joblib
@@ -23,31 +24,39 @@ from .explanation import (
 BASE_DIR = Path(__file__).resolve().parents[3]
 
 MODEL_DIR = BASE_DIR / "ml" / "models"
-if (MODEL_DIR / "embedding_model").is_dir():
+MODEL_VARIANT = os.getenv("MODEL_VARIANT", "tfidf").strip().lower()
+
+if MODEL_VARIANT not in {"tfidf", "embedding"}:
+    raise ValueError(
+        "MODEL_VARIANT must be either 'tfidf' or 'embedding'"
+    )
+
+if MODEL_VARIANT == "embedding":
     ACTIVE_MODEL_DIR = MODEL_DIR / "embedding_model"
 else:
     ACTIVE_MODEL_DIR = MODEL_DIR
 
 
-def load_joblib_artifact(path):
-    """Load a joblib pickle artifact safely, mapping PyTorch CUDA tensors to CPU if CUDA is unavailable."""
-    obj = None
-    try:
-        import torch
-        if not torch.cuda.is_available():
-            orig_load = torch.load
-            def cpu_load(*args, **kwargs):
-                kwargs["map_location"] = torch.device("cpu")
-                return orig_load(*args, **kwargs)
-            try:
-                torch.load = cpu_load
-                obj = joblib.load(path)
-            finally:
-                torch.load = orig_load
-        else:
-            obj = joblib.load(path)
-    except Exception:
+def load_joblib_artifact(path, map_torch_to_cpu=False):
+    if not map_torch_to_cpu:
+        return joblib.load(path)
+
+    import torch
+
+    if torch.cuda.is_available():
         obj = joblib.load(path)
+    else:
+        orig_load = torch.load
+
+        def cpu_load(*args, **kwargs):
+            kwargs["map_location"] = torch.device("cpu")
+            return orig_load(*args, **kwargs)
+
+        try:
+            torch.load = cpu_load
+            obj = joblib.load(path)
+        finally:
+            torch.load = orig_load
 
     # Compatibility fix for SentenceTransformer objects pickled across different version boundaries
     if hasattr(obj, "modules"):
@@ -66,40 +75,55 @@ def load_joblib_artifact(path):
 
 print(f"Loading Fake Job Detector from {ACTIVE_MODEL_DIR}...")
 
-model_path = ACTIVE_MODEL_DIR / "xgboost_model.pkl" if (ACTIVE_MODEL_DIR / "xgboost_model.pkl").exists() else ACTIVE_MODEL_DIR / "model.pkl"
-model = load_joblib_artifact(model_path)
+map_torch_to_cpu = MODEL_VARIANT == "embedding"
+model_filename = "xgboost_model.pkl" if map_torch_to_cpu else "model.pkl"
+model = load_joblib_artifact(
+    ACTIVE_MODEL_DIR / model_filename,
+    map_torch_to_cpu=map_torch_to_cpu,
+)
 
 embedding_config_path = ACTIVE_MODEL_DIR / "embedding_config.pkl"
 tfidf_path = ACTIVE_MODEL_DIR / "tfidf.pkl"
 
 if embedding_config_path.exists():
     tfidf = None
-    embedding_config = load_joblib_artifact(embedding_config_path)
+    embedding_config = load_joblib_artifact(
+        embedding_config_path,
+        map_torch_to_cpu=map_torch_to_cpu,
+    )
 elif tfidf_path.exists():
-    tfidf = load_joblib_artifact(tfidf_path)
+    tfidf = load_joblib_artifact(
+        tfidf_path,
+        map_torch_to_cpu=map_torch_to_cpu,
+    )
     embedding_config = None
 else:
     tfidf = None
     embedding_config = None
 
 threshold = load_joblib_artifact(
-    ACTIVE_MODEL_DIR / "threshold.pkl"
+    ACTIVE_MODEL_DIR / "threshold.pkl",
+    map_torch_to_cpu=map_torch_to_cpu,
 )
 
 feature_names = load_joblib_artifact(
-    ACTIVE_MODEL_DIR / "feature_names.pkl"
+    ACTIVE_MODEL_DIR / "feature_names.pkl",
+    map_torch_to_cpu=map_torch_to_cpu,
 )
 
 scam_feature_names = load_joblib_artifact(
-    ACTIVE_MODEL_DIR / "scam_feature_names.pkl"
+    ACTIVE_MODEL_DIR / "scam_feature_names.pkl",
+    map_torch_to_cpu=map_torch_to_cpu,
 )
 
 feature_descriptions = load_joblib_artifact(
-    ACTIVE_MODEL_DIR / "feature_descriptions.pkl"
+    ACTIVE_MODEL_DIR / "feature_descriptions.pkl",
+    map_torch_to_cpu=map_torch_to_cpu,
 )
 
 config = load_joblib_artifact(
-    ACTIVE_MODEL_DIR / "config.pkl"
+    ACTIVE_MODEL_DIR / "config.pkl",
+    map_torch_to_cpu=map_torch_to_cpu,
 )
 
 

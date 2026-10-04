@@ -3,11 +3,12 @@
 ## Deploy the API to Render
 
 1. Create a Render Blueprint from this repository and use the included `render.yaml`, or create a Python web service with **Root Directory** set to `backend`.
-2. Set the required `MONGO_URL` environment variable to your MongoDB connection string. Ensure your MongoDB network access rules allow connections from Render.
-3. Set `CORS_ORIGINS` to the exact Vercel frontend origin, such as `https://your-project.vercel.app`. For multiple origins, separate them with commas; do not include URL paths or a trailing slash.
-4. Deploy and confirm `https://<your-render-service>.onrender.com/api/health` returns a healthy response.
+2. Set the **Start Command** to `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Do not add `--reload`.
+3. Set the required `MONGO_URL` environment variable to your MongoDB connection string. Ensure your MongoDB network access rules allow connections from Render.
+4. Set `CORS_ORIGINS` to the exact Vercel frontend origin, such as `https://your-project.vercel.app`. For multiple origins, separate them with commas; do not include URL paths or a trailing slash.
+5. Deploy and confirm `https://<your-render-service>.onrender.com/api/health` returns a healthy response.
 
-The Render service installs `backend/requirements.txt` and starts with Uvicorn on Render's assigned port. Model artifacts are loaded from the tracked `ml/models` directory in the repository.
+The Render service installs `backend/requirements.txt` and starts with Uvicorn on Render's assigned port. It uses the lightweight TF-IDF model by default (`MODEL_VARIANT=tfidf`) to stay within the free instance's memory limit. Set `MODEL_VARIANT=embedding` only on an instance with enough memory for the much larger Sentence Transformers model.
 
 ## Deploy the frontend to Vercel
 
