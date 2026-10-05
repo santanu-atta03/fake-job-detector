@@ -1,23 +1,21 @@
 import json
+import re
 import httpx
 from bs4 import BeautifulSoup
-
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/122.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "en-US,en;q=0.9",
-}
+from app.utils.url_parser import fetch_html, scrape_generic_url
 
 async def scrape_indeed(url: str) -> dict:
     """Scrape job details from Indeed link."""
-    async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-        response = await client.get(url, headers=HEADERS)
-        response.raise_for_status()
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    html_content = ""
+    try:
+        html_content = await fetch_html(url)
+    except Exception:
+        return await scrape_generic_url(url)
+
+    soup = BeautifulSoup(html_content, "html.parser")
 
     title = None
     company = None
@@ -101,6 +99,13 @@ async def scrape_indeed(url: str) -> dict:
     if description and ("<p>" in description or "<br>" in description or "<div>" in description):
         description = BeautifulSoup(description, "html.parser").get_text(separator="\n", strip=True)
 
+    if not title and not description:
+        generic_data = await scrape_generic_url(url)
+        title = title or generic_data.get("title")
+        company = company or generic_data.get("company")
+        description = description or generic_data.get("description")
+        location = location or generic_data.get("location")
+
     return {
         "title": title or "",
         "company": company or "",
@@ -118,3 +123,4 @@ async def scrape_indeed(url: str) -> dict:
         "has_questions": 0,
         "skills": []
     }
+

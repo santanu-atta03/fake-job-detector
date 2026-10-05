@@ -33,16 +33,26 @@ function JobForm({ onAnalyze, loading }) {
   }
 
   async function handleScrapeUrl(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     if (!jobUrl.trim()) return;
+
+    let cleanUrl = jobUrl.trim();
+    if (!/^https?:\/\//i.test(cleanUrl)) {
+      cleanUrl = "https://" + cleanUrl;
+      setJobUrl(cleanUrl);
+    }
 
     setScraping(true);
     setScrapeError("");
     setScrapeSuccess(false);
 
     try {
-      const data = await scrapeJobUrl(jobUrl.trim());
+      const data = await scrapeJobUrl(cleanUrl);
       
+      const hasContent = Boolean(
+        data.title || data.company || data.company_profile || data.description || data.location
+      );
+
       setFormData((prev) => ({
         ...prev,
         title: data.title || prev.title,
@@ -59,9 +69,13 @@ function JobForm({ onAnalyze, loading }) {
         has_questions: data.has_questions !== undefined ? data.has_questions : prev.has_questions,
       }));
 
-      setScrapeSuccess(true);
+      if (hasContent) {
+        setScrapeSuccess(true);
+      } else {
+        setScrapeError("Could not automatically extract job details from this link. Please fill in the details below.");
+      }
     } catch (err) {
-      setScrapeError(err.message || "Failed to auto-fill details from this URL.");
+      setScrapeError(err.message || "Failed to fetch details from this URL.");
     } finally {
       setScraping(false);
     }
@@ -79,10 +93,11 @@ function JobForm({ onAnalyze, loading }) {
           <Link2 size={16} /> Import from Job Link
         </legend>
         <div className="field">
-          <label>Paste Job Link (LinkedIn, Indeed, Glassdoor)</label>
+          <label>Paste Job Link (LinkedIn, Indeed, Glassdoor, etc.)</label>
           <div style={{ display: 'flex', gap: '8px' }}>
             <input
-              type="url"
+              type="text"
+              inputMode="url"
               value={jobUrl}
               onChange={(e) => setJobUrl(e.target.value)}
               placeholder="https://www.linkedin.com/jobs/view/..."

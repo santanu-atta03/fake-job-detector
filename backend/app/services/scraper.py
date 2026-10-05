@@ -1,10 +1,17 @@
-from app.utils.url_parser import parse_domain, scrape_generic_url
+from app.utils.url_parser import parse_domain, scrape_generic_url, infer_data_from_url
 from app.services.linkedin import scrape_linkedin
 from app.services.indeed import scrape_indeed
 from app.services.glassdoor import scrape_glassdoor
 
 async def scrape_job(url: str) -> dict:
     """Scrape job posting data by routing to platform specific scraper or fallback."""
+    if not url:
+        raise ValueError("URL is required")
+
+    url = url.strip()
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
+
     domain = parse_domain(url)
 
     try:
@@ -25,9 +32,9 @@ async def scrape_job(url: str) -> dict:
                     data[key] = value
 
         return data
-    except Exception as e:
-        # If platform scraping fails (e.g. anti-bot blocking), attempt generic fallback
+    except Exception:
+        # If platform scraping fails (e.g. anti-bot blocking), attempt generic fallback or url inference
         try:
             return await scrape_generic_url(url)
         except Exception:
-            raise ValueError(f"Could not scrape job details from URL: {str(e)}")
+            return infer_data_from_url(url)

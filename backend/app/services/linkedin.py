@@ -1,23 +1,46 @@
 import json
+import re
 import httpx
 from bs4 import BeautifulSoup
+from app.utils.url_parser import fetch_html, scrape_generic_url
 
-HEADERS = {
+HEADERS_LINKEDIN = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/122.0.0.0 Safari/537.36"
+        "Chrome/124.0.0.0 Safari/537.36"
     ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
 }
 
 async def scrape_linkedin(url: str) -> dict:
     """Scrape public LinkedIn job posting details."""
-    async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-        response = await client.get(url, headers=HEADERS)
-        response.raise_for_status()
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    html_content = ""
+    
+    # Try fetching via LinkedIn public guest API if job ID is in URL
+    job_id_match = re.search(r'(?:/jobs/view/|currentJobId=)(\d+)', url)
+    if job_id_match:
+        job_id = job_id_match.group(1)
+        guest_url = f"https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{job_id}"
+        try:
+            async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+                resp = await client.get(guest_url, headers=HEADERS_LINKEDIN)
+                if resp.status_code == 200 and resp.text:
+                    html_content = resp.text
+        except Exception:
+            pass
+
+    if not html_content:
+        try:
+            html_content = await fetch_html(url)
+        except Exception:
+            return await scrape_generic_url(url)
+
+    soup = BeautifulSoup(html_content, "html.parser")
 
     title = None
     company = None
@@ -58,6 +81,7 @@ async def scrape_linkedin(url: str) -> dict:
     if not title:
         title_el = (
             soup.select_one("h1.top-card-layout__title")
+            or soup.select_one("h2.top-card-layout__title")
             or soup.select_one("h1.topcard__title")
             or soup.select_one("h1")
         )
@@ -97,6 +121,14 @@ async def scrape_linkedin(url: str) -> dict:
     # Has company logo signal check
     logo_el = soup.select_one("img.artdeco-entity-image") or soup.select_one("img.company-logo")
     has_logo = 1 if logo_el or company else 0
+
+    # Fallback to generic url if main fields are missing
+    if not title and not description:
+        generic_data = await scrape_generic_url(url)
+        title = title or generic_data.get("title")
+        company = company or generic_data.get("company")
+        description = description or generic_data.get("description")
+        location = location or generic_data.get("location")
 
     return {
         "title": title or "",
