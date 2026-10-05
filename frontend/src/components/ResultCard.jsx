@@ -8,6 +8,7 @@ const TAB_COLOR = {
   Low: "var(--risk-low)",
   Medium: "var(--risk-medium)",
   High: "var(--risk-high)",
+  "Very High": "var(--risk-critical)",
   Critical: "var(--risk-critical)",
 };
 
@@ -18,6 +19,7 @@ function ResultCard({ result }) {
 
   const isFraudulent = result.prediction === "fraudulent";
   const color = TAB_COLOR[result.risk_level] || "var(--muted)";
+  const score = result.risk_score !== undefined ? result.risk_score : Math.round(result.fraud_probability);
 
   return (
     <div className="result-card">
@@ -36,13 +38,13 @@ function ResultCard({ result }) {
         </div>
       </div>
 
-      <RiskMeter probability={result.fraud_probability} riskLevel={result.risk_level} />
+      <RiskMeter probability={score} riskLevel={result.risk_level} />
 
       {result.domain_reputation && (
         <DomainReputationCard domainReputation={result.domain_reputation} />
       )}
 
-      <ReasonList reasons={result.reasons} />
+      <ReasonList findings={result.findings} reasons={result.reasons} />
 
       <div className="disclaimer">
         <strong>Important: </strong>

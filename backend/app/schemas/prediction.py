@@ -1,5 +1,4 @@
 from typing import List, Optional
-
 from pydantic import BaseModel, Field
 
 class JobPostingRequest(BaseModel):
@@ -31,6 +30,14 @@ class ExplanationReason(BaseModel):
     importance: float
     value: float
 
+class RiskFinding(BaseModel):
+    severity: str
+    category: str
+    title: str
+    description: str
+    evidence: Optional[str] = None
+    weight: Optional[int] = 0
+
 class DomainDetail(BaseModel):
     domain: str
     raw_url: str
@@ -55,8 +62,13 @@ class PredictionResponse(BaseModel):
     prediction: str
     fraud_probability: float
     legitimate_probability: float
+    risk_score: int
     risk_level: str
+    riskLevel: str
+    classification: str
+    confidence: float
     threshold: float
     reasons: List[str]
-    shap_details: List[ExplanationReason]
-    domain_reputation: Optional[DomainReputationSummary] = None
+    findings: List[RiskFinding] = []
+    shap_details: List[ExplanationReason] = []
+    domain_reputation: Optional[DomainReputationSummary] = None

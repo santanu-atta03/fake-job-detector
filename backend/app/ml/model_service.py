@@ -9,11 +9,16 @@ import shap
 from scipy.sparse import hstack, csr_matrix
 
 from .feature_engineering import create_scam_features
+from .fraud_rules import evaluate_job_rules
 from .domain_reputation import analyze_job_domains
 from .explanation import (
     get_risk_level,
+    get_risk_level_info,
     format_reason
 )
+
+
+
 
 
 
@@ -533,124 +538,93 @@ def get_shap_reasons(
 # ============================================================
 
 def predict_job(job_data):
-
     # --------------------------------------------------------
     # Prepare data
     # --------------------------------------------------------
-
-    df = prepare_job_data(
-        job_data
-    )
-
+    df = prepare_job_data(job_data)
 
     # --------------------------------------------------------
-    # Build features
+    # Build features & ML probability
     # --------------------------------------------------------
-
-    combined_vector, scam_features = (
-        build_model_input(df)
-    )
-
+    combined_vector, scam_features = build_model_input(df)
+    ml_fraud_prob = float(model.predict_proba(combined_vector)[0, 1])
 
     # --------------------------------------------------------
-    # Model probability
+    # Evaluate Rules & Domain Reputation
     # --------------------------------------------------------
-
-    fraud_probability = (
-        model
-        .predict_proba(
-            combined_vector
-        )[0, 1]
-    )
-
-
+    rule_risk_points, findings = evaluate_job_rules(job_data)
     domain_reputation = analyze_job_domains(job_data)
 
-    # Adjust fraud probability if domain risk anomalies (typosquatting, newly registered, high-risk TLD) are present
     if domain_reputation.get("typosquatting_count", 0) > 0:
-        fraud_probability = max(fraud_probability, 0.88)
+        rule_risk_points += 30
+        findings.append({
+            "severity": "HIGH",
+            "category": "TYPOSQUATTING",
+            "title": "Typosquatted / Brand Impersonation Domain",
+            "description": "The posting contains links to a domain that visually mimics a known brand.",
+            "evidence": "Typosquatted domain detected",
+            "weight": 30
+        })
     elif domain_reputation.get("newly_registered_count", 0) > 0 or domain_reputation.get("suspicious_tld_count", 0) > 0:
-        fraud_probability = max(fraud_probability, 0.65)
+        rule_risk_points += 15
+        findings.append({
+            "severity": "MEDIUM",
+            "category": "DOMAIN_RISK",
+            "title": "Newly Registered or Suspicious Domain",
+            "description": "The posting contains links to a newly registered or high-risk domain.",
+            "evidence": "Suspicious domain metadata",
+            "weight": 15
+        })
 
-    # --------------------------------------------------------
-    # Classification
-    # --------------------------------------------------------
+    # Sort findings by severity: CRITICAL > HIGH > MEDIUM > LOW
+    severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
+    findings.sort(key=lambda x: severity_order.get(x.get("severity", "LOW"), 4))
 
-    prediction = (
+    # Calculate final composite risk score (0-100)
+    base_ml_score = ml_fraud_prob * 100.0
 
-        "fraudulent"
+    if any(f["severity"] == "CRITICAL" for f in findings):
+        final_score = max(75.0, min(99.0, base_ml_score + rule_risk_points))
+    elif any(f["severity"] == "HIGH" for f in findings):
+        final_score = max(50.0, min(95.0, base_ml_score + rule_risk_points))
+    elif rule_risk_points > 0:
+        final_score = min(95.0, max(float(rule_risk_points), 0.4 * base_ml_score + 0.6 * rule_risk_points))
+    else:
+        final_score = base_ml_score
 
-        if fraud_probability >= threshold
+    risk_score = int(round(max(0.0, min(100.0, final_score))))
+    risk_info = get_risk_level_info(risk_score)
 
-        else "legitimate"
-    )
+    prediction = "fraudulent" if risk_score >= 50 else "legitimate"
+    final_fraud_prob = round(float(risk_score), 2)
+    final_legit_prob = round(float(100 - risk_score), 2)
 
-    # --------------------------------------------------------
-    # SHAP explanation & Human reasons
-    # --------------------------------------------------------
-
-    reasons = get_shap_reasons(
-        combined_vector,
-        top_n=5
-    )
-
-    risk_level = get_risk_level(
-        fraud_probability
-    )
-    human_reasons = [
-
-        format_reason(reason)
-
-        for reason in reasons
-
-        if reason["impact"] == "increases fraud risk"
-    ]
+    # SHAP explanations
+    reasons = get_shap_reasons(combined_vector, top_n=5)
     
-    # Add high-level domain risk findings to human reasons
-    if domain_reputation.get("has_domain_risk"):
-        for dom in domain_reputation.get("domains", []):
-            for flag in dom.get("flags", []):
-                domain_msg = f"Domain Warning ({dom['domain']}): {flag}"
-                if domain_msg not in human_reasons:
-                    human_reasons.append(domain_msg)
-
-
-    # --------------------------------------------------------
-    # Return result
-    # --------------------------------------------------------
+    # Generate human reasons, prioritizing structured findings over weak ML signals
+    human_reasons = [f["title"] + ": " + f["description"] for f in findings]
+    
+    if not human_reasons:
+        human_reasons = [
+            format_reason(reason)
+            for reason in reasons
+            if reason["impact"] == "increases fraud risk"
+        ]
 
     return {
-        "prediction":
-            prediction,
-        "fraud_probability":
-            round(
-                float(fraud_probability * 100),
-                2
-            ),
-
-        "legitimate_probability":
-            round(
-                float(
-                    (1 - fraud_probability) * 100
-                ),
-                2
-            ),
-
-        "risk_level":
-            risk_level,
-
-        "threshold":
-            round(
-                float(threshold * 100),
-                2
-            ),
-
-        "reasons":
-            human_reasons,
-
-        "shap_details":
-            reasons,
-
-        "domain_reputation":
-            domain_reputation
+        "prediction": prediction,
+        "fraud_probability": final_fraud_prob,
+        "legitimate_probability": final_legit_prob,
+        "risk_score": risk_score,
+        "risk_level": risk_info["risk_level"],
+        "riskLevel": risk_info["riskLevel"],
+        "classification": risk_info["classification"],
+        "confidence": risk_info["confidence"],
+        "threshold": round(float(threshold * 100), 2),
+        "reasons": human_reasons,
+        "findings": findings,
+        "shap_details": reasons,
+        "domain_reputation": domain_reputation
     }
+

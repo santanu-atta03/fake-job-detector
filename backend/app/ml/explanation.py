@@ -1,13 +1,45 @@
-def get_risk_level(fraud_probability : float) -> str:
+def get_risk_level_info(risk_score: float) -> dict:
+    score = int(round(risk_score))
+    if score < 20:
+        return {
+            "risk_level": "Low",
+            "riskLevel": "LOW",
+            "classification": "LEGITIMATE",
+            "confidence": round(min(0.99, max(0.80, 1.0 - (score / 100.0))), 2)
+        }
+    elif score < 50:
+        return {
+            "risk_level": "Medium",
+            "riskLevel": "MEDIUM",
+            "classification": "POTENTIALLY_SUSPICIOUS",
+            "confidence": round(min(0.95, max(0.60, score / 100.0 + 0.3)), 2)
+        }
+    elif score < 75:
+        return {
+            "risk_level": "High",
+            "riskLevel": "HIGH",
+            "classification": "SUSPICIOUS",
+            "confidence": round(min(0.98, max(0.85, score / 100.0 + 0.2)), 2)
+        }
+    else:
+        return {
+            "risk_level": "Very High",
+            "riskLevel": "VERY_HIGH",
+            "classification": "SUSPICIOUS",
+            "confidence": round(min(0.99, max(0.90, score / 100.0 + 0.1)), 2)
+        }
+
+def get_risk_level(fraud_probability: float) -> str:
     percentage = fraud_probability * 100
-    if percentage < 30:
+    if percentage < 20:
         return "Low"
-    elif percentage < 60:
+    elif percentage < 50:
         return "Medium"
-    elif percentage < 80:
+    elif percentage < 75:
         return "High"
     else:
         return "Very High"
+
 
 def format_reason(reason : dict) -> str:
     feature = reason["feature"]

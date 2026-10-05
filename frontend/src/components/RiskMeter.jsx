@@ -4,6 +4,7 @@ const RISK_COLOR = {
   Low: "var(--risk-low)",
   Medium: "var(--risk-medium)",
   High: "var(--risk-high)",
+  "Very High": "var(--risk-critical)",
   Critical: "var(--risk-critical)",
 };
 
