@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_dimension": 384,
+    "text_columns": [
+        "title",
+        "company_profile",
+        "description",
+        "requirements",
+        "benefits"
+    ],
+    "scam_feature_count": 35,
+    "total_feature_count": 419,
+    "threshold": 0.36000000000000004,
+    "risk_levels": {
+        "low": "< 0.40",
+        "medium": "0.40 - 0.7499",
+        "high": ">= 0.75"
+    },
+    "xgboost": {
+        "n_estimators": 400,
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 2,
+        "reg_lambda": 1.0
+    },
+    "calibration": "logistic_platt_style_calibration",
+    "threshold_selection": "validation_set_only",
+    "test_set_used_for_threshold": false
+}

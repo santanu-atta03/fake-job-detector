@@ -1,0 +1,13 @@
+{
+    "model_version": "2.0.0",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "feature_count": 419,
+    "scam_feature_count": 35,
+    "threshold": 0.36000000000000004,
+    "test_accuracy": 0.9888143176733781,
+    "test_precision": 0.9583333333333334,
+    "test_recall": 0.8023255813953488,
+    "test_f1": 0.8734177215189873,
+    "test_roc_auc": 0.9891440985980926,
+    "test_pr_auc": 0.9247622359100021
+}
